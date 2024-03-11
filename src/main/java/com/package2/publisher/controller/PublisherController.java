@@ -48,8 +48,8 @@ public class PublisherController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<PublisherModel> req = new HttpEntity<>(publisherModel, headers);
         try {
-            ResponseEntity<HttpStatus> responseEntity = restTemplate.exchange(url,
-                    HttpMethod.POST, req, HttpStatus.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(url,
+                    HttpMethod.POST, req, String.class);
 
             HttpStatusCode httpStatus = responseEntity.getStatusCode();
             System.out
