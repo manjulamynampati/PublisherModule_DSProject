@@ -32,14 +32,15 @@ public class PublisherController {
 
     // Method for new publisher to get added @Shreya Krishnamoorthy
     @PostMapping(value = "/addPublisher")
-    public String addPublisher(@RequestBody String publisherId) {
-        PublisherModel publisherModel = new PublisherModel();
-        publisherModel.setPublisherId(publisherId);
+    public String addPublisher(@RequestBody PublisherModel publisherModel) {
+//        //PublisherModel publisherModel = new PublisherModel();
+//        publisherModel.setPublisherId(publisherId);
+//
         publisherModel.setStatus("active");
-        if (!publisherObjectHelperMap.containsKey(publisherId)) {
-            publisherObjectHelperMap.put(publisherId, publisherModel);
+        if (!publisherObjectHelperMap.containsKey(publisherModel.getPublisherId())) {
+            publisherObjectHelperMap.put(publisherModel.getPublisherId(), publisherModel);
         } else {
-            System.out.println("Publisher with ID: " + publisherId + " already exists");
+            System.out.println("Publisher with ID: " + publisherModel.getPublisherId() + " already exists");
         }
         String brokerUrl = "http://" + brokerIp + ":" + ec2Port;
         String url = brokerUrl + "/addPublisher";
@@ -56,7 +57,7 @@ public class PublisherController {
                     .println("Received response from broker with status code for publisher add: " + httpStatus.value());
             String responseString = "Received response from broker with status code: "
                     + httpStatus.value()
-                    + "\nPublisher with ID: " + publisherId + " is added to the broker system";
+                    + "\nPublisher with ID: " + publisherModel.getPublisherId() + " is added to the broker system";
             return responseString;
         } catch (Exception e) {
             System.out.println("An error occurred while communicating with the broker: " + e.getMessage());
@@ -67,19 +68,21 @@ public class PublisherController {
     // Method for publisher to change status between "active" and "inactive" @Shreya
     // Krishnamoorthy
     @PostMapping(value = "/changePublisherStatus")
-    public String changePublisherStatus(@RequestBody String publisherId) {
-        if (!publisherObjectHelperMap.containsKey(publisherId)) {
-            System.out.println("Publisher with ID " + publisherId + " not found");
+    public String changePublisherStatus(@RequestBody PublisherModel publisher) {
+        if (!publisherObjectHelperMap.containsKey(publisher.getPublisherId())) {
+            System.out.println("Publisher with ID " + publisher.getPublisherId() + " not found");
             return "Publisher not found";
         }
-        PublisherModel publisherModel = publisherObjectHelperMap.get(publisherId);
+        PublisherModel publisherModel = publisherObjectHelperMap.get(publisher.getPublisherId());
         String status = publisherModel.getStatus();
+
         if (status.equals("active")) {
+
             publisherModel.setStatus("inactive");
         } else if (status.equals("inactive")) {
             publisherModel.setStatus("active");
         } else {
-            System.out.println("Error in setting Publisher Status for publisher ID:" + publisherId);
+            System.out.println("Error in setting Publisher Status for publisher ID:" + publisherModel.getPublisherId());
             return "Error in setting publisher status";
         }
 
@@ -98,7 +101,7 @@ public class PublisherController {
                     + httpStatus.value());
             String responseString = "Received response from broker with status code: "
                     + httpStatus.value()
-                    + "\nPublisher with ID: " + publisherId + " changed status to " + publisherModel.getStatus();
+                    + "\nPublisher with ID: " + publisherModel.getPublisherId() + " changed status to " + publisherModel.getStatus();
             return responseString;
         } catch (Exception e) {
             System.out.println("An error occurred while communicating with the broker: " + e.getMessage());
